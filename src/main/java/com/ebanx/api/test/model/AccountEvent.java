@@ -5,7 +5,7 @@ public class AccountEvent {
 	private String type;
 	private String origin;
 	private String destination;
-	private double amount;
+	private int amount;
 	public String getType() {
 		return type;
 	}
@@ -24,10 +24,10 @@ public class AccountEvent {
 	public void setDestination(String destination) {
 		this.destination = destination;
 	}
-	public double getAmount() {
+	public int getAmount() {
 		return amount;
 	}
-	public void setAmount(double amount) {
+	public void setAmount(int amount) {
 		this.amount = amount;
 	}
 	
