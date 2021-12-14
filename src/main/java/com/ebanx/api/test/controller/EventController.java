@@ -1,8 +1,6 @@
 package com.ebanx.api.test.controller;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ebanx.api.test.model.Account;
 import com.ebanx.api.test.model.AccountEvent;
-import com.ebanx.api.test.model.AccountResponse;
 import com.ebanx.api.test.repository.AccountRepository;
 
 @RestController
@@ -29,7 +26,7 @@ public class EventController {
 	public ResponseEntity handler(@RequestBody AccountEvent accountEvent) {
 				
 		if ("deposit".equals(accountEvent.getType())) {
-			int id = Integer.valueOf(accountEvent.getDestination());
+			String id = accountEvent.getDestination();
 			int amount = Integer.valueOf(accountEvent.getAmount());
 			Account account = accountRepository.findById(id);
 			if (account == null) {
@@ -42,26 +39,18 @@ public class EventController {
 				account.setBalance(newBalance);
 			}
 			accountRepository.save(account);
-			//response.setHttpStatus(HttpStatus.CREATED.value());
-			//response.setData(account);
-			Map<String,AccountResponse> response = new HashMap<String, AccountResponse>();
-			AccountResponse accountResponse = new AccountResponse();
-			accountResponse.setId(account.getId().toString());
-			accountResponse.setBalance(String.valueOf(account.getBalance()));
-			response.put("destination", accountResponse);
+			Map<String,Account> response = new HashMap<String, Account>();
+			response.put("destination", account);
 			return ResponseEntity.status(HttpStatus.CREATED).body(response);
 			
 			
 		}
 		
 		if ("withdraw".equals(accountEvent.getType())) {
-			int id = Integer.valueOf(accountEvent.getOrigin());
+			String id = accountEvent.getOrigin();
 			int amount = Integer.valueOf(accountEvent.getAmount());
 			Account account = accountRepository.findById(id);
 			if (account == null) {
-				//response.setHttpStatus(HttpStatus.NOT_FOUND.value());
-				//response.setData(0);
-				//return new ResponseEntity<Response>(response, HttpStatus.NOT_FOUND);
 				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("0");
 
 			} else {
@@ -71,8 +60,6 @@ public class EventController {
 				}
 			}
 			accountRepository.save(account);
-			//response.setHttpStatus(HttpStatus.CREATED.value());
-			//response.setData(account);
 			Map<String,Account> response = new HashMap<String, Account>();
 			response.put("origin", account);
 			return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -80,15 +67,12 @@ public class EventController {
 		}
 		
 		if ("transfer".equals(accountEvent.getType())) {
-			int idOrigin = Integer.valueOf(accountEvent.getOrigin());
-			int idDestination = Integer.valueOf(accountEvent.getDestination());
+			String idOrigin = accountEvent.getOrigin();
+			String idDestination = accountEvent.getDestination();
 			int amount = Integer.valueOf(accountEvent.getAmount());
 			Account origin = accountRepository.findById(idOrigin);
 			Account destination = accountRepository.findById(idDestination);
 			if (origin == null) {
-				//response.setHttpStatus(HttpStatus.NOT_FOUND.value());
-				//response.setData(0);
-				//return new ResponseEntity<Response>(response, HttpStatus.NOT_FOUND);
 				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("0");
 
 			} else {
@@ -109,19 +93,14 @@ public class EventController {
 					
 				}
 			}
-			List<Account> list = new ArrayList<Account>();
-			list.add(origin);
-			list.add(destination);
-			
-			//response.setHttpStatus(HttpStatus.CREATED.value());
-			//response.setData(list);
-			Map<String,List<Account>>response = new HashMap<String, List<Account>>();
-			response.put("destination",list);
+			Map<String,Account>response = new HashMap<String,Account>();
+			response.put("origin",origin);
+			response.put("destination", destination);
 			return ResponseEntity.status(HttpStatus.CREATED).body(response);
 			
 		}
-		//return new ResponseEntity<Response>(response, HttpStatus.CREATED);
-		return null;
+		
+		return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body("Method Not Allowed");
 
 	}
 

@@ -9,6 +9,6 @@ import com.ebanx.api.test.model.Account;
 @Repository
 public interface AccountRepository extends JpaRepository<Account,Integer> {
 	
-	Account findById(int id);
+	Account findById(String id);
 
 }
